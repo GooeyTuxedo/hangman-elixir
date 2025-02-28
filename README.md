@@ -7,11 +7,13 @@ A classic hangman game built with Elixir and Phoenix LiveView. This project demo
 ## Features
 
 - Interactive gameplay with real-time updates
+- Multiple difficulty levels (Easy, Medium, Hard)
 - Virtual keyboard for easy letter selection
 - Sound effects for correct/incorrect guesses
 - Animations for game interactions
 - Responsive design for desktop and mobile
 - Mute/unmute toggle for sound effects
+- Extensive word list with over 200 words
 
 ## Technology Stack
 
@@ -22,12 +24,16 @@ A classic hangman game built with Elixir and Phoenix LiveView. This project demo
 
 ## Game Rules
 
-1. The game selects a random word
-2. Players guess one letter at a time
-3. Correct guesses reveal the letter in the word
-4. Incorrect guesses add to the hangman drawing
-5. Players win by guessing all letters before the hangman is complete
-6. Players lose if the hangman drawing is completed (6 incorrect guesses)
+1. Select a difficulty level:
+   - Easy: 3-5 letter words
+   - Medium: 6-8 letter words
+   - Hard: 9+ letter words
+2. The game selects a random word based on the chosen difficulty
+3. Players guess one letter at a time
+4. Correct guesses reveal the letter in the word
+5. Incorrect guesses add to the hangman drawing
+6. Players win by guessing all letters before the hangman is complete
+7. Players lose if the hangman drawing is completed (6 incorrect guesses)
 
 ## Installation
 
@@ -60,8 +66,9 @@ mix phx.server
 
 ## Project Structure
 
-- `lib/hangman/game.ex` - Game logic module
+- `lib/hangman/game.ex` - Core game logic module
 - `lib/hangman/games.ex` - Game context module
+- `lib/hangman/word_list.ex` - Word management with difficulty levels
 - `lib/hangman_web/live/game/show.ex` - LiveView controller
 - `lib/hangman_web/live/game/show.html.heex` - LiveView template
 - `assets/js/hangman_hooks.js` - JavaScript hooks for sound effects
@@ -76,6 +83,7 @@ This project demonstrates several important aspects of Elixir and Phoenix:
 - LiveView for interactive UIs without JavaScript
 - Event handling and state management
 - Animation and sound integration
+- Dynamic difficulty levels
 
 ## Testing
 
@@ -87,19 +95,17 @@ mix test
 
 The project includes tests for:
 - Game logic
-- LiveView functionality
-- User interactions
 
 ## Future Enhancements
 
 Some ideas for further development:
 
-- Difficulty levels (easy, medium, hard)
 - Timer mode
 - Two-player mode
-- Word categories
+- Word categories (Animals, Food, Technology, etc.)
 - Leaderboard
 - Hint system
+- Custom word lists
 
 ## License
 
