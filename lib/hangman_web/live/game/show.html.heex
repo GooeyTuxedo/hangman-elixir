@@ -5,35 +5,34 @@
       <p class="text-lg text-gray-600">Guess the word before the hangman is complete!</p>
     </div>
 
-    <div id="hangman-sounds-hook" phx-hook="HangmanSounds"></div>
-
     <div class="grid md:grid-cols-2 gap-8">
       <!-- Left column: Game state -->
       <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
         <!-- Hangman drawing -->
         <div class="font-mono text-gray-800 whitespace-pre text-xl mb-6 bg-gray-100 p-4 rounded-lg w-full text-center">
+                  <%= if @last_guess_correct == false, do: "animate-incorrect-guess" %>
           <%= case @game.turns_left do %>
             <% 0 -> %>
               +---+
               |   |
               O   |
-            /|\  |
-            / \  |
+             /|\  |
+             / \  |
                   |
                   =
             <% 1 -> %>
               +---+
               |   |
               O   |
-            /|\  |
-            /    |
+             /|\  |
+             /    |
                   |
                   =
             <% 2 -> %>
               +---+
               |   |
               O   |
-            /|\  |
+             /|\  |
                   |
                   |
                   =
@@ -41,7 +40,7 @@
               +---+
               |   |
               O   |
-            /|   |
+             /|   |
                   |
                   |
                   =
@@ -84,18 +83,30 @@
       <div class="bg-white rounded-xl shadow-lg p-6">
         <!-- Word display -->
         <div class="text-4xl font-mono tracking-wider mb-8 text-center py-4 border-b border-t border-indigo-100">
-          <%= Hangman.Games.revealed_word(@game) %>
+          <%= for {letter, index} <- String.codepoints(@game.word) |> Enum.with_index() do %>
+            <% 
+              is_revealed = MapSet.member?(@game.letters_guessed, letter)
+              is_last_guess = @last_guess == letter && @last_guess_correct
+            %>
+            <span class={[
+              is_last_guess && "animate-correct-letter text-green-600",
+              !is_revealed && "text-gray-800"
+            ]}>
+              <%= if is_revealed, do: letter, else: "_" %>
+            </span>
+            <%= if index < String.length(@game.word) - 1, do: " ", else: "" %>
+          <% end %>
         </div>
 
         <!-- Game messages -->
         <%= if @game.game_state == :won do %>
-          <div class="p-4 bg-green-100 text-green-800 rounded-lg mb-6 text-center font-bold text-xl">
+          <div class="p-4 bg-green-100 text-green-800 rounded-lg mb-6 text-center font-bold text-xl animate-fade-in">
             🎉 Congratulations! You won! 🎉
           </div>
         <% end %>
 
         <%= if @game.game_state == :lost do %>
-          <div class="p-4 bg-red-100 text-red-800 rounded-lg mb-6 text-center">
+          <div class="p-4 bg-red-100 text-red-800 rounded-lg mb-6 text-center animate-fade-in">
             <p class="font-bold text-xl mb-2">Game over!</p>
             <p>The word was: <span class="font-mono font-bold"><%= @game.word %></span></p>
           </div>
@@ -106,9 +117,13 @@
           <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Letters guessed:</h3>
           <div class="flex flex-wrap gap-2">
             <%= for letter <- @game.letters_guessed |> MapSet.to_list() |> Enum.sort() do %>
-              <% is_in_word = String.contains?(@game.word, letter) %>
+              <% 
+                is_in_word = String.contains?(@game.word, letter) 
+                is_last_guess = @last_guess == letter
+              %>
               <div class={[
                 "w-8 h-8 flex items-center justify-center rounded-full font-medium",
+                is_last_guess && "animate-pop-in",
                 if(is_in_word, do: "bg-green-100 text-green-800", else: "bg-red-100 text-red-800")
               ]}>
                 <%= letter %>
@@ -137,7 +152,7 @@
 
         <!-- New game button -->
         <%= if @game.game_state in [:won, :lost] do %>
-          <.button phx-click="new_game" class="w-full bg-indigo-600 hover:bg-indigo-700 mt-4">
+          <.button phx-click="new_game" class="w-full bg-indigo-600 hover:bg-indigo-700 mt-4 animate-fade-in">
             Play Again
           </.button>
         <% end %>
@@ -153,6 +168,7 @@
             <% 
               already_guessed = MapSet.member?(@game.letters_guessed, letter) 
               is_in_word = String.contains?(@game.word, letter) && already_guessed
+              is_last_guess = @last_guess == letter
             %>
             <button 
               phx-click="guess" 
@@ -160,6 +176,7 @@
               disabled={already_guessed}
               class={[
                 "w-10 h-10 rounded-md font-medium text-lg transition",
+                is_last_guess && (if @last_guess_correct, do: "animate-correct-letter", else: "animate-incorrect-guess"),
                 cond do
                   already_guessed && is_in_word -> "bg-green-200 text-green-800 cursor-not-allowed opacity-70"
                   already_guessed && !is_in_word -> "bg-red-200 text-red-800 cursor-not-allowed opacity-70"
@@ -174,16 +191,21 @@
       </div>
     <% end %>
   </div>
-
+  
+  <!-- Footer -->
   <footer class="mt-12 py-6 bg-white border-t border-gray-200">
     <div class="max-w-4xl mx-auto px-4 text-center text-gray-500 text-sm">
       Built with Elixir and Phoenix LiveView
     </div>
   </footer>
-
+  
+  <!-- Hooks and elements for JavaScript functionality -->
+  <div id="hangman-sounds-hook" phx-hook="HangmanSounds"></div>
+  
+  <!-- Sound control -->
   <div class="fixed bottom-4 right-4 bg-white p-2 rounded-full shadow-md" 
-    id="sound-control" 
-    phx-hook="SoundControl">
+       id="sound-control" 
+       phx-hook="SoundControl">
     <button class="p-2 rounded-full hover:bg-gray-100">
       <!-- Volume icon (default) -->
       <svg id="volume-on" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -193,7 +215,7 @@
       <svg id="volume-off" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-     </svg>
+      </svg>
     </button>
   </div>
 </div>

@@ -12,6 +12,8 @@ defmodule HangmanWeb.GameLive.Show do
       |> assign(:page_title, "Hangman Game")
       |> assign(:game, game)
       |> assign(:guess, "")
+      |> assign(:last_guess, nil)
+      |> assign(:last_guess_correct, nil)
 
     {:ok, socket}
   end
@@ -31,24 +33,30 @@ defmodule HangmanWeb.GameLive.Show do
       socket
       |> assign(:game, game)
       |> assign(:guess, "")
+      |> assign(:last_guess, guess)
+      |> assign(:last_guess_correct, is_correct)
 
-    # Push guess result event for sound effect
+    # Event dispatching for sounds
     socket =
       if just_ended do
-        # Push game-over event with win/lose status
         push_event(socket, "game-over", %{won: game.game_state == :won})
       else
-        # Only push guess-result for non-ending guesses
         push_event(socket, "guess-result", %{correct: is_correct})
       end
 
+    # Add a timer to clear the animation state after 1 second
+    Process.send_after(self(), :clear_animation, 1000)
+
     {:noreply, socket}
   end
 
-  def handle_event("guess", _params, socket) do
+  # Handle when user clicks a letter instead of typing
+  @impl true
+  def handle_event("guess", %{"guess" => guess}, socket) do
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("new_game", _params, socket) do
     game = Games.new_game()
 
@@ -56,6 +64,8 @@ defmodule HangmanWeb.GameLive.Show do
       socket
       |> assign(:game, game)
       |> assign(:guess, "")
+      |> assign(:last_guess, nil)
+      |> assign(:last_guess_correct, nil)
 
     {:noreply, socket}
   end
