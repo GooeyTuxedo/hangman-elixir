@@ -1,0 +1,100 @@
+<.header>
+  Hangman Game
+  <:subtitle>Try to guess the word before the hangman is complete!</:subtitle>
+</.header>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <div class="text-3xl font-mono tracking-wider mb-4">
+      <%= Hangman.Games.revealed_word(@game) %>
+    </div>
+    
+    <div class="mb-4">
+      <p>Turns left: <%= @game.turns_left %></p>
+      <p>
+        Letters guessed: 
+        <%= @game.letters_guessed |> MapSet.to_list() |> Enum.join(", ") %>
+      </p>
+    </div>
+    
+    <%= if @game.game_state == :won do %>
+      <div class="p-4 bg-green-100 text-green-800 rounded-lg mb-4">
+        Congratulations! You won!
+      </div>
+    <% end %>
+    
+    <%= if @game.game_state == :lost do %>
+      <div class="p-4 bg-red-100 text-red-800 rounded-lg mb-4">
+        Game over! The word was: <%= @game.word %>
+      </div>
+    <% end %>
+    
+    <%= if @game.game_state not in [:won, :lost] do %>
+      <.simple_form for={%{}} phx-submit="guess">
+        <.input type="text" name="guess" value={@guess} placeholder="Enter a letter" maxlength="1" autofocus />
+        <:actions>
+          <.button>Guess</.button>
+        </:actions>
+      </.simple_form>
+    <% end %>
+    
+    <%= if @game.game_state in [:won, :lost] do %>
+      <.button phx-click="new_game">New Game</.button>
+    <% end %>
+  </div>
+  
+  <!-- Simple hangman drawing representation -->
+  <div class="font-mono whitespace-pre text-xl">
+    <%= case @game.turns_left do %>
+      <% 0 -> %>
+        +---+
+        |   |
+        O   |
+       /|\  |
+       / \  |
+            |
+      <% 1 -> %>
+        +---+
+        |   |
+        O   |
+       /|\  |
+       /    |
+            |
+      <% 2 -> %>
+        +---+
+        |   |
+        O   |
+       /|\  |
+            |
+            |
+      <% 3 -> %>
+        +---+
+        |   |
+        O   |
+       /|   |
+            |
+            |
+      <% 4 -> %>
+        +---+
+        |   |
+        O   |
+        |   |
+            |
+            |
+      <% 5 -> %>
+        +---+
+        |   |
+        O   |
+            |
+            |
+            |
+      <% _ -> %>
+        +---+
+        |   |
+            |
+            |
+            |
+            |
+    <% end %>
+  </div>
+</div>
