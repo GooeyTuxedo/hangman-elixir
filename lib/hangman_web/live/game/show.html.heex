@@ -35,8 +35,10 @@
         <!-- Left column: Game state -->
         <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
           <!-- Hangman drawing -->
-          <div class="font-mono text-gray-800 whitespace-pre text-xl mb-6 bg-gray-100 p-4 rounded-lg w-full text-center">
-                    <%= if @last_guess_correct == false, do: "animate-incorrect-guess" %>
+          <div class={[
+            "font-mono text-gray-800 whitespace-pre text-xl mb-6 bg-gray-100 p-4 rounded-lg w-full text-center",
+            @last_guess_correct == false && "animate-incorrect-guess"
+          ]}>
             <%= case @game.turns_left do %>
               <% 0 -> %>
                 +---+
