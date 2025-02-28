@@ -63,20 +63,9 @@ defmodule HangmanWeb.GameLive.Show do
     {:noreply, socket}
   end
 
-  # Handle animation clearing
-  @impl true
-  def handle_info(:clear_animation, socket) do
-    socket =
-      socket
-      |> assign(:last_guess, nil)
-      |> assign(:last_guess_correct, nil)
-
-    {:noreply, socket}
-  end
-
   # Handle when user clicks a letter instead of typing
   @impl true
-  def handle_event("guess", %{"guess" => guess}, socket) do
+  def handle_event("guess", %{"guess" => _guess}, socket) do
     {:noreply, socket}
   end
 
@@ -87,6 +76,17 @@ defmodule HangmanWeb.GameLive.Show do
       |> assign(:screen, :difficulty_select)
       |> assign(:game, nil)
       |> assign(:guess, "")
+      |> assign(:last_guess, nil)
+      |> assign(:last_guess_correct, nil)
+
+    {:noreply, socket}
+  end
+
+  # Handle animation clearing
+  @impl true
+  def handle_info(:clear_animation, socket) do
+    socket =
+      socket
       |> assign(:last_guess, nil)
       |> assign(:last_guess_correct, nil)
 
