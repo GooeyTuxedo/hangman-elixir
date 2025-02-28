@@ -5,17 +5,30 @@ defmodule HangmanWeb.GameLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    game = Games.new_game()
-
     socket =
       socket
       |> assign(:page_title, "Hangman Game")
-      |> assign(:game, game)
+      |> assign(:game, nil)
       |> assign(:guess, "")
       |> assign(:last_guess, nil)
       |> assign(:last_guess_correct, nil)
+      |> assign(:difficulty_levels, Games.difficulty_levels())
+      |> assign(:screen, :difficulty_select)
 
     {:ok, socket}
+  end
+
+  @impl true
+  def handle_event("select_difficulty", %{"difficulty" => difficulty}, socket) do
+    difficulty = String.to_existing_atom(difficulty)
+    game = Games.new_game(difficulty)
+
+    socket =
+      socket
+      |> assign(:game, game)
+      |> assign(:screen, :game)  # Switch to game screen
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -58,11 +71,10 @@ defmodule HangmanWeb.GameLive.Show do
 
   @impl true
   def handle_event("new_game", _params, socket) do
-    game = Games.new_game()
-
     socket =
       socket
-      |> assign(:game, game)
+      |> assign(:screen, :difficulty_select)
+      |> assign(:game, nil)
       |> assign(:guess, "")
       |> assign(:last_guess, nil)
       |> assign(:last_guess_correct, nil)

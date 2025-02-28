@@ -3,19 +3,38 @@ defmodule Hangman.Game do
     word: "",
     letters_guessed: MapSet.new(),
     turns_left: 6,
-    game_state: :initializing
+    game_state: :initializing,
+    difficulty: :medium
   ]
 
-  def new_game(word) do
+  @doc """
+  Creates a new game with the specified word and difficulty.
+  When only a word is provided, it defaults to medium difficulty.
+  """
+  def new_game(word, difficulty \\ :medium) when is_binary(word) do
     %__MODULE__{
-      word: String.downcase(word)
+      word: String.downcase(word),
+      difficulty: difficulty
     }
   end
 
+  @doc """
+  Creates a new game with default settings (medium difficulty).
+  """
   def new_game do
-    new_game(random_word())
+    word = Hangman.WordList.random_word(:medium)
+    new_game(word, :medium)
   end
 
+  @doc """
+  Creates a new game with the specified difficulty.
+  """
+  def new_game_with_difficulty(difficulty) when is_atom(difficulty) do
+    word = Hangman.WordList.random_word(difficulty)
+    new_game(word, difficulty)
+  end
+
+  # Make sure the rest of your game logic is here
   def make_guess(game, guess) do
     guess = String.downcase(guess)
 
@@ -67,11 +86,5 @@ defmodule Hangman.Game do
       end
     end)
     |> Enum.join(" ")
-  end
-
-  defp random_word do
-    # You could read from a file or API, but for simplicity:
-    words = ~w(phoenix elixir programming functional erlang beam)
-    Enum.random(words)
   end
 end
