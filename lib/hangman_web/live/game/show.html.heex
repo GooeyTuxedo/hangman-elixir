@@ -1,100 +1,175 @@
-<.header>
-  Hangman Game
-  <:subtitle>Try to guess the word before the hangman is complete!</:subtitle>
-</.header>
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <.header class="text-center mb-8">
+    <span class="text-4xl font-bold text-indigo-700">Hangman</span>
+    <:subtitle>
+      <span class="text-gray-600 mt-2">Guess the word before the hangman is complete!</span>
+    </:subtitle>
+  </.header>
 
-<div class="max-w-2xl mx-auto">
-  <div class="mb-6">
-    <div class="text-3xl font-mono tracking-wider mb-4">
-      <%= Hangman.Games.revealed_word(@game) %>
-    </div>
-    
-    <div class="mb-4">
-      <p>Turns left: <%= @game.turns_left %></p>
-      <p>
-        Letters guessed: 
-        <%= @game.letters_guessed |> MapSet.to_list() |> Enum.join(", ") %>
-      </p>
-    </div>
-    
-    <%= if @game.game_state == :won do %>
-      <div class="p-4 bg-green-100 text-green-800 rounded-lg mb-4">
-        Congratulations! You won!
+  <div class="grid md:grid-cols-2 gap-8">
+    <!-- Left column: Game state -->
+    <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
+      <!-- Hangman drawing -->
+      <div class="font-mono text-gray-800 whitespace-pre text-xl mb-6 bg-gray-100 p-4 rounded-lg w-full text-center">
+        <%= case @game.turns_left do %>
+          <% 0 -> %>
+            +---+
+            |   |
+            O   |
+           /|\\  |
+           / \\  |
+                |
+                =
+          <% 1 -> %>
+            +---+
+            |   |
+            O   |
+           /|\\  |
+           /    |
+                |
+                =
+          <% 2 -> %>
+            +---+
+            |   |
+            O   |
+           /|\\  |
+                |
+                |
+                =
+          <% 3 -> %>
+            +---+
+            |   |
+            O   |
+           /|   |
+                |
+                |
+                =
+          <% 4 -> %>
+            +---+
+            |   |
+            O   |
+            |   |
+                |
+                |
+                =
+          <% 5 -> %>
+            +---+
+            |   |
+            O   |
+                |
+                |
+                |
+                =
+          <% _ -> %>
+            +---+
+            |   |
+                |
+                |
+                |
+                |
+                =
+        <% end %>
       </div>
-    <% end %>
-    
-    <%= if @game.game_state == :lost do %>
-      <div class="p-4 bg-red-100 text-red-800 rounded-lg mb-4">
-        Game over! The word was: <%= @game.word %>
+
+      <!-- Game status -->
+      <div class="w-full text-center">
+        <div class="text-lg font-semibold text-gray-700 mb-2">
+          Turns left: <span class="text-indigo-600 font-bold"><%= @game.turns_left %></span>
+        </div>
       </div>
-    <% end %>
-    
-    <%= if @game.game_state not in [:won, :lost] do %>
-      <.simple_form for={%{}} phx-submit="guess">
-        <.input type="text" name="guess" value={@guess} placeholder="Enter a letter" maxlength="1" autofocus />
-        <:actions>
-          <.button>Guess</.button>
-        </:actions>
-      </.simple_form>
-    <% end %>
-    
-    <%= if @game.game_state in [:won, :lost] do %>
-      <.button phx-click="new_game">New Game</.button>
-    <% end %>
+    </div>
+
+    <!-- Right column: Word and controls -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <!-- Word display -->
+      <div class="text-4xl font-mono tracking-wider mb-8 text-center py-4 border-b border-t border-indigo-100">
+        <%= Hangman.Games.revealed_word(@game) %>
+      </div>
+
+      <!-- Game messages -->
+      <%= if @game.game_state == :won do %>
+        <div class="p-4 bg-green-100 text-green-800 rounded-lg mb-6 text-center font-bold text-xl">
+          🎉 Congratulations! You won! 🎉
+        </div>
+      <% end %>
+
+      <%= if @game.game_state == :lost do %>
+        <div class="p-4 bg-red-100 text-red-800 rounded-lg mb-6 text-center">
+          <p class="font-bold text-xl mb-2">Game over!</p>
+          <p>The word was: <span class="font-mono font-bold"><%= @game.word %></span></p>
+        </div>
+      <% end %>
+
+      <!-- Letters guessed -->
+      <div class="mb-6">
+        <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Letters guessed:</h3>
+        <div class="flex flex-wrap gap-2">
+          <%= for letter <- @game.letters_guessed |> MapSet.to_list() |> Enum.sort() do %>
+            <% is_in_word = String.contains?(@game.word, letter) %>
+            <div class={[
+              "w-8 h-8 flex items-center justify-center rounded-full font-medium",
+              if(is_in_word, do: "bg-green-100 text-green-800", else: "bg-red-100 text-red-800")
+            ]}>
+              <%= letter %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Input form -->
+      <%= if @game.game_state not in [:won, :lost] do %>
+        <.simple_form for={%{}} phx-submit="guess" class="mt-4">
+          <.input 
+            type="text" 
+            name="guess" 
+            value={@guess} 
+            placeholder="Enter a letter" 
+            maxlength="1" 
+            autofocus
+            class="text-center text-xl"
+          />
+          <:actions>
+            <.button class="w-full bg-indigo-600 hover:bg-indigo-700">Guess</.button>
+          </:actions>
+        </.simple_form>
+      <% end %>
+
+      <!-- New game button -->
+      <%= if @game.game_state in [:won, :lost] do %>
+        <.button phx-click="new_game" class="w-full bg-indigo-600 hover:bg-indigo-700 mt-4">
+          Play Again
+        </.button>
+      <% end %>
+    </div>
   </div>
-  
-  <!-- Simple hangman drawing representation -->
-  <div class="font-mono whitespace-pre text-xl">
-    <%= case @game.turns_left do %>
-      <% 0 -> %>
-        +---+
-        |   |
-        O   |
-       /|\  |
-       / \  |
-            |
-      <% 1 -> %>
-        +---+
-        |   |
-        O   |
-       /|\  |
-       /    |
-            |
-      <% 2 -> %>
-        +---+
-        |   |
-        O   |
-       /|\  |
-            |
-            |
-      <% 3 -> %>
-        +---+
-        |   |
-        O   |
-       /|   |
-            |
-            |
-      <% 4 -> %>
-        +---+
-        |   |
-        O   |
-        |   |
-            |
-            |
-      <% 5 -> %>
-        +---+
-        |   |
-        O   |
-            |
-            |
-            |
-      <% _ -> %>
-        +---+
-        |   |
-            |
-            |
-            |
-            |
-    <% end %>
-  </div>
+
+  <!-- Keyboard -->
+  <%= if @game.game_state not in [:won, :lost] do %>
+    <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
+      <h3 class="text-center text-gray-600 mb-4">Or click a letter:</h3>
+      <div class="flex flex-wrap justify-center gap-2">
+        <%= for letter <- ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z) do %>
+          <% 
+            already_guessed = MapSet.member?(@game.letters_guessed, letter) 
+            is_in_word = String.contains?(@game.word, letter) && already_guessed
+          %>
+          <button 
+            phx-click="guess" 
+            phx-value-guess={letter}
+            disabled={already_guessed}
+            class={[
+              "w-10 h-10 rounded-md font-medium text-lg transition",
+              cond do
+                already_guessed && is_in_word -> "bg-green-200 text-green-800 cursor-not-allowed opacity-70"
+                already_guessed && !is_in_word -> "bg-red-200 text-red-800 cursor-not-allowed opacity-70"
+                true -> "bg-gray-200 hover:bg-indigo-100 text-gray-800 hover:text-indigo-800"
+              end
+            ]}
+          >
+            <%= letter %>
+          </button>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 </div>
