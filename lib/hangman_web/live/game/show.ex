@@ -33,13 +33,14 @@ defmodule HangmanWeb.GameLive.Show do
       |> assign(:guess, "")
 
     # Push guess result event for sound effect
-    if just_ended do
-      # Push game-over event with win/lose status
-      push_event(socket, "game-over", %{won: game.game_state == :won})
-    else
-      # Only push guess-result for non-ending guesses
-      push_event(socket, "guess-result", %{correct: is_correct})
-    end
+    socket =
+      if just_ended do
+        # Push game-over event with win/lose status
+        push_event(socket, "game-over", %{won: game.game_state == :won})
+      else
+        # Only push guess-result for non-ending guesses
+        push_event(socket, "guess-result", %{correct: is_correct})
+      end
 
     {:noreply, socket}
   end
