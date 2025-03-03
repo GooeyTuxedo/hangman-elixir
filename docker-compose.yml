@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "4040:4000"
+    environment:
+      - SECRET_KEY_BASE=your_secret_key_base_here
+      - PHX_HOST=localhost
+    networks:
+      - phoenix_network
+
+networks:
+  phoenix_network:
+    driver: bridge
