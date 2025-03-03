@@ -1,5 +1,3 @@
-// assets/js/hangman_hooks.js
-
 // Shared state that persists across LiveView updates
 window.hangmanSoundState = {
   enabled: localStorage.getItem('hangmanSoundEnabled') !== 'false'
