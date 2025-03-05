@@ -20,6 +20,14 @@ defmodule HangmanWeb.Router do
     live "/", GameLive.Show, :show
   end
 
+  scope "/", HangmanWeb do
+    # Note: Using a separate pipeline without CSRF protection
+    # since health checks don't need it
+    pipe_through :api
+    
+    get "/health", HealthController, :check
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", HangmanWeb do
   #   pipe_through :api
