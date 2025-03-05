@@ -7,12 +7,16 @@
 # General application configuration
 import Config
 
+# Get the domain from environment variable or use a default
+host = System.get_env("PHX_HOST") || "localhost"
+port = String.to_integer(System.get_env("PORT") || "4000")
+
 config :hangman,
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
 config :hangman, HangmanWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: host, port: port],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: HangmanWeb.ErrorHTML, json: HangmanWeb.ErrorJSON],
