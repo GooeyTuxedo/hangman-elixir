@@ -49,5 +49,7 @@ COPY --from=build /app/_build/prod/rel/hangman ./
 RUN adduser -D app
 USER app
 
+EXPOSE 4000
+
 # Run the Phoenix app
 CMD ["bin/hangman", "start"]

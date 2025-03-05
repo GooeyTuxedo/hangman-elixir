@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hangman-app
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  rules:
+  - host: hangman.based.consulting
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hangman-app
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - hangman.based.consulting
+    secretName: hangman-app-tls

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hangman-app
+  labels:
+    app: hangman-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hangman-app
+  template:
+    metadata:
+      labels:
+        app: hangman-app
+    spec:
+      containers:
+      - name: hangman-app
+        image: ghcr.io/gooeytuxedo/hangman-elixir:sha-341ba39
+        ports:
+        - containerPort: 4000
+        env:
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: hangman-app-secrets
+              key: secret-key-base
+        - name: PHX_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: hangman-app-config
+              key: phx-host
+        - name: PHX_SERVER
+          value: "true"
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 4000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4000
+          initialDelaySeconds: 20
+          periodSeconds: 30
