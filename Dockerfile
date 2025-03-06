@@ -4,6 +4,7 @@ FROM elixir:1.17-alpine AS build
 RUN apk add --no-cache build-base npm git
 
 # Set working directory
+RUN mkdir /app
 WORKDIR /app
 
 # Install hex and rebar
@@ -36,7 +37,10 @@ RUN mix release
 FROM alpine:3.21 AS app
 RUN apk add --no-cache libstdc++ openssl ncurses-libs
 
+RUN mkdir /app
 WORKDIR /app
+
+EXPOSE 4000
 
 # Set runtime ENV
 ENV MIX_ENV=prod
@@ -45,11 +49,9 @@ ENV PHX_SERVER=true
 # Copy the release from the build stage
 COPY --from=build /app/_build/prod/rel/hangman ./
 
-# Run the Phoenix app as a non-root user for better security
-RUN adduser -D app
-USER app
+RUN chown -R nobody: /app
+USER nobody
 
-EXPOSE 4000
-
+ENV HOME=/app
 # Run the Phoenix app
 CMD ["bin/hangman", "start"]
