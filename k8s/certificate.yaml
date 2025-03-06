@@ -7,6 +7,7 @@ spec:
   usages:
     - server auth
     - client auth
+  commonName: hangman.based.consulting
   dnsNames:
     - hangman.based.consulting
   issuerRef:

@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hangman-app
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`hangman.based.consulting`)
+      kind: Rule
+      services:
+        - kind: Service
+          name: hangman-app
+          port: 80
+  tls:
+    secretName: hangman-app-tls
+    domains:
+      - main: hangman.based.consulting
+
