@@ -24,12 +24,10 @@ RUN mix deps.compile
 COPY assets assets
 COPY priv priv
 # RUN cd assets && npm install && npm run deploy ## for externally managed npm packages
+COPY lib lib
 RUN mix assets.deploy
-RUN mix phx.digest
 
 # Compile the application
-COPY lib lib
-# COPY rel rel
 RUN mix compile
 RUN mix phx.gen.release && mix release
 
