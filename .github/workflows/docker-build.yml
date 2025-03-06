@@ -51,8 +51,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
 
       # - name: Update Kubernetes manifests
       #   if: startsWith(github.ref, 'refs/tags/')
@@ -61,7 +61,7 @@ jobs:
       #     # Optional: Add script to update kustomization.yaml with the new image tag
       #     # This could be a separate workflow or job that updates your k8s repo
 
-      - name: Notify deployment
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          echo "::notice::New image pushed: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}"
+      # - name: Notify deployment
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   run: |
+      #     echo "::notice::New image pushed: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}"
