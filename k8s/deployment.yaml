@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: hangman-app
-          image: ghcr.io/gooeytuxedo/hangman-elixir:sha-e488828
+          image: ghcr.io/gooeytuxedo/hangman-elixir:sha-ece72f9
           ports:
             - containerPort: 4000
           env:
