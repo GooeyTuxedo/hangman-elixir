@@ -24,13 +24,14 @@ RUN mix deps.compile
 COPY assets assets
 COPY priv priv
 # RUN cd assets && npm install && npm run deploy ## for externally managed npm packages
+RUN mix assets.deploy
 RUN mix phx.digest
 
 # Compile the application
 COPY lib lib
 # COPY rel rel
 RUN mix compile
-RUN mix release
+RUN mix phx.gen.release && mix release
 
 # Start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
