@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: hangman-app
-          image: ghcr.io/gooeytuxedo/hangman-elixir:sha-3c8f788
+          image: ghcr.io/gooeytuxedo/hangman-elixir:sha-e70c6b6
           ports:
             - containerPort: 4000
           env:
@@ -57,6 +57,6 @@ spec:
             capabilities:
               drop: [ALL]
       securityContext:
-        runAsUser: 1000
+        runAsUser: 65534
         seccompProfile:
           type: RuntimeDefault
