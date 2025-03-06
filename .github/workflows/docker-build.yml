@@ -4,8 +4,18 @@ on:
   push:
     branches: [ main ]
     tags: [ 'v*' ]
+    paths-ignore:
+      - 'k8s/**'
+      - '.github/**'
+      - '*.md'
+      - 'docs/**'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - 'k8s/**'
+      - '.github/**'
+      - '*.md'
+      - 'docs/**'
 
 env:
   REGISTRY: ghcr.io
